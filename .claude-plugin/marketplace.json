@@ -1,0 +1,36 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "athena",
+  "owner": {
+    "name": "olympusforge"
+  },
+  "metadata": {
+    "description": "Athena — an agentic coding kit for Claude Code: 32 skills, 16 subagents, 8 always-on rules. brainstorm → plan → implement → review → ship.",
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "athena",
+      "source": "./plugins/athena",
+      "description": "Disciplined delivery pipeline for Claude Code as /athena: skills (plan, exec, fix, debug, code-review, ship, git, ...), 16 model-tiered subagents, 6 output styles, and always-on rules delivered by a SessionStart hook or /athena:setup.",
+      "version": "1.0.0",
+      "author": {
+        "name": "olympusforge"
+      },
+      "homepage": "https://github.com/olympusforge/athena",
+      "repository": "https://github.com/olympusforge/athena",
+      "license": "MIT",
+      "keywords": [
+        "workflow",
+        "planning",
+        "agents",
+        "skills",
+        "code-review",
+        "ship",
+        "debugging"
+      ],
+      "category": "productivity"
+    }
+  ]
+}

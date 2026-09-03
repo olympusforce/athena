@@ -1,0 +1,28 @@
+{
+  "source": {
+    "repo": "olympusforge/athena-organic",
+    "path": ".claude",
+    "commit": "5b5945bca6f8a5eb5f172411ba7eaa36caf22b50",
+    "commitDate": "2026-09-03T18:17:59+07:00",
+    "dirty": false
+  },
+  "syncedAt": "2026-09-03T11:21:04.102Z",
+  "toolVersion": "sync.mjs@1",
+  "agentNamespace": true,
+  "counts": {
+    "files": 399,
+    "skills": 32,
+    "agents": 16,
+    "rules": 8,
+    "outputStyles": 6
+  },
+  "rewrites": {
+    "R1": 244,
+    "R2": 32,
+    "R3a": 17,
+    "R3b": 23,
+    "R3c": 2
+  },
+  "patches": 0,
+  "outputSha256": "37c21aa189e953dab42bd65c0dcc53bd9dafe67d04596c6757519551e2578af6"
+}

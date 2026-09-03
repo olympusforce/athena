@@ -1,0 +1,38 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+    tags: ["athena--v*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate marketplace and plugin manifests
+        run: |
+          claude plugin validate --strict .
+          claude plugin validate --strict plugins/athena
+      - name: Lint vendored plugin content
+        run: node scripts/lint-plugin.mjs
+      - name: Check version consistency
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            node scripts/check-version.mjs --tag="${GITHUB_REF_NAME}"
+          else
+            node scripts/check-version.mjs
+          fi
+      - name: Test SessionStart hook output
+        run: bash plugins/athena/hooks/test-inject.sh
+      - name: Shell syntax
+        run: |
+          bash -n plugins/athena/hooks/inject-rules.sh
+          bash -n plugins/athena/skills/setup/scripts/setup-rules.sh
