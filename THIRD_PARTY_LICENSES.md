@@ -1,7 +1,7 @@
 # Third-party licenses
 
 This repository is MIT licensed (see `LICENSE`). The vendored kit under
-`plugins/athena/` is synced from [olympusforge/athena-organic](https://github.com/olympusforge/athena-organic)
+`plugins/athena/` is synced from [olympusforce/athena-organic](https://github.com/olympusforce/athena-organic)
 (also MIT). The following subtrees carry their own licenses, which continue to apply:
 
 | Path | License |

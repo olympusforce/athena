@@ -3,10 +3,10 @@
   "description": "Disciplined delivery pipeline for Claude Code as /athena: skills (plan, exec, fix, debug, code-review, ship, git, ...), 16 model-tiered subagents, 6 output styles, and always-on rules delivered by a SessionStart hook or /athena:setup.",
   "version": "1.0.0",
   "author": {
-    "name": "olympusforge"
+    "name": "olympusforce"
   },
-  "homepage": "https://github.com/olympusforge/athena",
-  "repository": "https://github.com/olympusforge/athena",
+  "homepage": "https://github.com/olympusforce/athena",
+  "repository": "https://github.com/olympusforce/athena",
   "license": "MIT",
   "keywords": [
     "workflow",

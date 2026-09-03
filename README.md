@@ -16,7 +16,7 @@
 ## Install
 
 ```bash
-claude plugin marketplace add olympusforge/athena
+claude plugin marketplace add olympusforce/athena
 claude plugin install athena
 ```
 
@@ -166,7 +166,7 @@ you are working in, exactly as with the file-copy install.
 
 ## Relationship to athena-organic
 
-[`olympusforge/athena-organic`](https://github.com/olympusforge/athena-organic) is
+[`olympusforce/athena-organic`](https://github.com/olympusforce/athena-organic) is
 the **source of truth** and still supports copying `.claude/` into a project.
 This repository vendors it:
 

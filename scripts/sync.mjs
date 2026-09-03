@@ -138,7 +138,7 @@ for (const f of walk(STAGE)) {
 }
 const countDir = (d, pred = () => true) => readdirSync(join(STAGE, d)).filter(pred).length;
 const lock = {
-  source: { repo: "olympusforge/athena-organic", path: ".claude", commit, commitDate, dirty },
+  source: { repo: "olympusforce/athena-organic", path: ".claude", commit, commitDate, dirty },
   syncedAt: new Date().toISOString(),
   toolVersion: "sync.mjs@1",
   agentNamespace: NS_AGENTS,
