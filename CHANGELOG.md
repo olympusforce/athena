@@ -1,11 +1,11 @@
 # Changelog
 
-## 1.2.0 — unreleased
+## 1.2.0 — 2026-09-25
 
 - `/athena:git --watch`: after `cp` / `pr`, or on an existing PR (`#N`, `PR N`, URL), watch the PR until CI is green and the project's review gates approve. Gates are discovered from project rules, branch rules, the PR, and repo config — no bot is hardcoded. Read-only; stops and reports on failure.
 - `/athena:git --no-ai` (default) / `--ai-signature`: commit messages, PR titles, and PR bodies carry no AI signatures unless `--ai-signature` is passed; a verification grep blocks the write on a hit.
 
-## 1.1.0 — unreleased
+## 1.1.0 — 2026-09-25 (untagged; first tagged in 1.2.0)
 
 - `/athena:exec` testing is opt-in: pass `--test` (implied by `--tdd`). The `no-test` mode is removed; `--test` composes with any mode. The finalize report always states `tests: NOT RUN` when testing was skipped.
 - Runtime task tracking is opt-in: pass `--tasks` to `/athena:plan` or `/athena:exec`. `/athena:plan` forwards `--tasks` / `--test` on handoff to exec.
