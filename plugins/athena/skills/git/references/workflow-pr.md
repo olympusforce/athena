@@ -18,7 +18,7 @@ PRs based on remote branches. Local diff includes unpushed changes.
 ```bash
 git fetch origin && \
 git push -u origin HEAD 2>/dev/null || true && \
-BASE=${BASE_BRANCH:-main} && \
+BASE=${TO_BRANCH:-main} && \
 HEAD=$(git rev-parse --abbrev-ref HEAD) && \
 echo "=== PR: $HEAD → $BASE ===" && \
 echo "=== COMMITS ===" && \
@@ -33,6 +33,9 @@ git diff origin/$BASE...origin/$HEAD --stat
 
 **Title:** Conventional commit format, <72 chars, NO version numbers
 **Body:** Summary bullets + Test plan checklist
+**AI signatures:** with `--no-ai` (default), strip AI artifacts from title and
+body and run the verification grep in `commit-standards.md` on both; a hit
+blocks `gh pr create`. With `--ai-signature`, keep the runtime's normal attribution.
 
 ## Tool 3: Create PR
 
@@ -46,6 +49,8 @@ gh pr create --base $BASE --head $HEAD --title "..." --body "$(cat <<'EOF'
 EOF
 )"
 ```
+
+With `--watch`: return the PR number/URL; the invoking session (not `git-manager`) continues with `workflow-watch.md`.
 
 ## DO NOT use (local comparison)
 

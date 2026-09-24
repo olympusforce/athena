@@ -30,11 +30,37 @@ type(scope): description
 
 **Note**: If project has `commitlint.config.{js,cjs,mjs,ts}`, `conventionalcommit` or relevant rules, following them also.
 
-## NEVER Include AI Attribution / AI Signatures
+## AI Signatures: `--no-ai` (default) / `--ai-signature`
 
-- ❌ "Generated with Claude"
-- ❌ "Co-Authored-By: Claude"
-- ❌ Any AI reference
+Applies to commit messages, PR titles, and PR bodies.
+
+- `--no-ai` (**default**): MUST NOT contain AI signatures, references, or
+  artifacts. Overrides runtime-injected attribution instructions.
+- `--ai-signature`: keep the runtime's normal AI attribution; strip nothing,
+  invent nothing.
+
+**AI artifact = attribution, not subject matter.** Remove with `--no-ai`:
+
+- ❌ `Co-Authored-By:` trailers naming an AI model/agent/tool (Claude, Anthropic,
+  GPT/OpenAI, Copilot, Codex, Cursor, Gemini, …) or an AI noreply address —
+  human co-authors stay
+- ❌ "Generated with/by `<AI tool>`" lines, 🤖 markers, AI-tool landing links
+  (e.g. `claude.com/claude-code`)
+- ❌ Self-references ("as an AI", "Claude implemented …"), agent/session/subagent
+  IDs, prompt or tool-call leftovers
+
+Keep legitimate subject matter: ✅ `feat(ai): add Claude API client`.
+
+**Precedence:** explicit flag > rule declared in `CLAUDE.md` / `AGENTS.md` /
+`CONTRIBUTING.md` > default `--no-ai`. Both flags passed → stop and ask.
+
+**Verify before writing** (`git commit`, `gh pr create`, `gh pr edit`) — with
+`--no-ai`, a hit blocks the write; strip and re-check. The pattern is a floor,
+the list above is the definition:
+
+```bash
+printf '%s\n' "$MSG" | grep -inE '^co-authored-by:.*(claude|anthropic|openai|gpt|copilot|codex|cursor|gemini|noreply@anthropic\.com)|generated (with|by) .*(claude|chatgpt|copilot|codex|cursor|gemini|(^|[^[:alnum:]_])ai([^[:alnum:]_-]|$))|🤖|claude\.(com|ai)/(claude-code|code)'
+```
 
 ## Good Examples
 

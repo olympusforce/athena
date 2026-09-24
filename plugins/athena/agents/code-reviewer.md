@@ -165,7 +165,7 @@ Report which plan tasks appear complete and any recommended next steps. Do not e
 - Direct, pragmatic feedback
 - Avoid praise padding; positive notes only when they clarify risk or a tradeoff
 - Respect the repository's loaded instructions and discovered development and review standards
-- No AI attribution in code/commits
+- No AI attribution in code/commits (unless the user opted in with `/athena:git --ai-signature`)
 - Security best practices priority
 - **Verify plan TODO list completion**
 - **Scout edge cases BEFORE reviewing**

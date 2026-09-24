@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke for commits, PRs, stacked PRs, branch hygiene, or release git steps.'
 category: dev-tools
 keywords: [git, commits, staging, PR, merge, merge-pr, stack, stacked-prs, ci]
-argument-hint: 'cm|cp|pr|merge|merge-pr|stack [args]'
+argument-hint: 'cm|cp|pr|merge|merge-pr|stack|<#N|PR N|pr-url> [args] [--watch] [--no-ai|--ai-signature]'
 ---
 
 # Git Operations
@@ -26,6 +26,7 @@ If invoked without arguments, use `ask_user capability` to present available git
 Present as options via `ask_user capability` with header "Git Operation", question "What would you like to do?".
 
 Execute git workflows via `git-manager` subagent to isolate verbose output.
+`--watch` runs in the invoking session, not `git-manager` (long-running poll).
 Activate `context-engineering` skill.
 
 **IMPORTANT:**
@@ -51,6 +52,20 @@ Activate `context-engineering` skill.
   - Lifecycle: `init` → `add` → `submit --auto` → `sync`/`rebase` → `merge`
   - Guardrail: history-rewriting and multi-PR merge steps are user-gated; force-push stays scoped to stack branches
   - See `references/workflow-stacked-prs.md` for the full command surface and exit-code stop conditions
+- `<#N | PR N | pr-url>`: Target an existing PR — with `--watch`, just watch it; without, show its status (`gh pr view` + `gh pr checks`)
+
+**Flags:**
+
+- `--watch`: After `cp` / `pr` / PR-ref, watch the PR until CI is green and the
+  project's review gates (human or bot) approve. Rejected with anything but
+  `cp` / `pr` / PR-ref ("no PR to watch"; `merge-pr` has its own CI watch). See `references/workflow-watch.md`
+- `--no-ai` (**default**): Commit messages, PR titles, and PR bodies MUST NOT
+  contain AI signatures, references, or artifacts
+- `--ai-signature`: Keep the runtime's normal AI attribution behavior
+- AI-signature rules, precedence, and verification: `references/commit-standards.md`
+
+**Compound requests:** `cp then make pr to <branch> --watch` → `cp` → `pr`
+(TO_BRANCH=`<branch>`) → watch that PR.
 
 ## Quick Reference
 
@@ -62,6 +77,7 @@ Activate `context-engineering` skill.
 | Merge        | `references/workflow-merge.md`       |
 | Merge PR     | `references/workflow-merge-pr.md`    |
 | Stacked PRs  | `references/workflow-stacked-prs.md` |
+| Watch PR     | `references/workflow-watch.md`       |
 | Standards    | `references/commit-standards.md`     |
 | Safety       | `references/safety-protocols.md`     |
 | Branches     | `references/branch-management.md`    |
@@ -105,6 +121,8 @@ git diff --cached | grep -iE "(api[_-]?key|token|password|secret|credential)"
 
 ### Step 4: Commit
 
+Apply the AI-signature mode first (`--no-ai` default; see `references/commit-standards.md`).
+
 ```bash
 git commit -m "type(scope): description"
 ```
@@ -116,6 +134,8 @@ git commit -m "type(scope): description"
 ✓ security: passed
 ✓ commit: HASH type(scope): description
 ✓ pushed: yes/no
+✓ ai-signature: stripped (--no-ai) | kept (--ai-signature)
+✓ watch: <PR url> — N/N gates satisfied   (with --watch; ✗ watch: <PR url> — blocked by <gate>)
 ```
 
 ## Error Handling
@@ -135,6 +155,7 @@ git commit -m "type(scope): description"
 - `references/workflow-merge.md` - Branch merge workflow
 - `references/workflow-merge-pr.md` - PR merge with post-merge CI watch and verification
 - `references/workflow-stacked-prs.md` - GitHub native Stacked PRs via `gh stack` (lifecycle + safety)
+- `references/workflow-watch.md` - `--watch`: PR gate contract discovery, poll loop, stop conditions
 - `references/commit-standards.md` - Conventional commit format rules
 - `references/safety-protocols.md` - Secret detection, branch protection
 - `references/branch-management.md` - Naming, lifecycle, strategies

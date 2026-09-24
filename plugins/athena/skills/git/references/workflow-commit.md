@@ -42,6 +42,10 @@ NOTE:
 
 ## Tool 3: Commit
 
+**AI signatures:** with `--no-ai` (default), strip AI artifacts from each
+message and run the verification grep in `commit-standards.md`; a hit blocks
+the commit. With `--ai-signature`, keep the runtime's normal attribution.
+
 **Single:**
 
 ```bash
@@ -63,3 +67,5 @@ git push && echo "✓ pushed: yes" || echo "✓ pushed: no"
 ```
 
 **Only push if user explicitly requested** ("push", "commit and push").
+
+With `--watch` (`cp`): return the pushed branch; the invoking session (not `git-manager`) continues with `workflow-watch.md`.

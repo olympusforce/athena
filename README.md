@@ -77,6 +77,9 @@ refers to a command that exists.
 `/athena:plan` writes a plan directory under `.athena/plans/` in your project.
 `/athena:exec` implements it phase by phase with code review on by default.
 `/athena:git` writes conventional commits and scans for secrets before staging.
+Commit messages and PR titles/bodies carry no AI signatures by default
+(`--no-ai`; opt in with `--ai-signature`). `--watch` watches the PR until CI is
+green and the project's review gates approve (`/athena:git #159 --watch`).
 
 ## Skills
 

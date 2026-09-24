@@ -19,7 +19,8 @@ Use this file when editing code, tests, scripts, or configuration.
 - Run the narrowest useful test first, then broaden when shared behavior or public contracts changed.
 - Do not hide failing tests, lint, type, build, or syntax errors.
 - Preserve public contracts unless the change intentionally updates them and the user accepted that scope.
-- Keep commits focused and use conventional commit format without AI references.
+- Keep commits focused and use conventional commit format without AI references,
+  unless the user opts in with `/athena:git --ai-signature`.
 - Never commit secrets, dotenv files, tokens, private keys, database credentials, or personal data.
 
 ## Tooling
