@@ -39,7 +39,12 @@ SessionStart hook injects the same rules into every session, so behavior is
 identical either way. The hook detects the materialized files and stops
 injecting, so rules are never loaded twice.
 
-Update later with `claude plugin update athena@athena`; remove with
+When a newer version is published, a one-line notice with the update commands
+appears at startup (checked at most once a day; offline is silent; opt out with
+`ATHENA_NO_UPDATE_CHECK=1`).
+
+Update later with `claude plugin marketplace update athena && claude plugin update athena@athena`
+(then restart; re-run `/athena:setup` in projects that ran it); remove with
 `claude plugin uninstall athena@athena`.
 
 ### Requirements
@@ -191,7 +196,7 @@ This repository vendors it:
 ```bash
 node scripts/sync.mjs                       # re-vendor from ../athena-organic/.claude
 claude plugin validate --strict . && claude plugin validate --strict plugins/athena
-node scripts/lint-plugin.mjs && bash plugins/athena/hooks/test-inject.sh
+node scripts/lint-plugin.mjs && bash plugins/athena/hooks/test-inject.sh && bash plugins/athena/hooks/test-update-check.sh
 claude --plugin-dir ./plugins/athena        # try it without installing
 ```
 

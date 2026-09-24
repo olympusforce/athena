@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 — unreleased
+
+- Update notice: at startup, when a newer athena is published, a one-line message shows the update commands and the CHANGELOG link. Checked at most once per 24h (cached), 2s timeout, silent offline or on error. Opt out with `ATHENA_NO_UPDATE_CHECK=1`.
+
 ## 1.2.0 — 2026-09-25
 
 - `/athena:git --watch`: after `cp` / `pr`, or on an existing PR (`#N`, `PR N`, URL), watch the PR until CI is green and the project's review gates approve. Gates are discovered from project rules, branch rules, the PR, and repo config — no bot is hardcoded. Read-only; stops and reports on failure.

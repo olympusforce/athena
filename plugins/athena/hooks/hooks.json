@@ -1,5 +1,5 @@
 {
-  "description": "Athena: inject the always-on rules until /athena:setup writes them into the project; type a queued /compact for /athena:ctx.",
+  "description": "Athena: inject the always-on rules until /athena:setup writes them into the project; type a queued /compact for /athena:ctx; notify once per startup when a newer athena is published.",
   "hooks": {
     "SessionStart": [
       {
@@ -24,6 +24,16 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-rules.sh\" 4 4",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/update-check.sh\"",
+            "timeout": 5
           }
         ]
       }

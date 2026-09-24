@@ -31,8 +31,11 @@ jobs:
             node scripts/check-version.mjs
           fi
       - name: Test SessionStart hook output
-        run: bash plugins/athena/hooks/test-inject.sh
+        run: |
+          bash plugins/athena/hooks/test-inject.sh
+          bash plugins/athena/hooks/test-update-check.sh
       - name: Shell syntax
         run: |
           bash -n plugins/athena/hooks/inject-rules.sh
+          bash -n plugins/athena/hooks/update-check.sh
           bash -n plugins/athena/skills/setup/scripts/setup-rules.sh
