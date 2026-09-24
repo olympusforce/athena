@@ -26,8 +26,8 @@ LOOP:
 
   3. ask_user capability (header: "Review & Approve"):
      IF critical_count > 0:
-       - "Fix critical issues" → fix, re-run tester, cycle++, LOOP
-       - "Fix all issues" → fix all, re-run tester, cycle++, LOOP
+       - "Fix critical issues" → fix, re-run tester (only with `--test`/`--tdd`), cycle++, LOOP
+       - "Fix all issues" → fix all, re-run tester (only with `--test`/`--tdd`), cycle++, LOOP
        - "Approve anyway" → PROCEED
        - "Abort" → stop
      ELSE:
@@ -52,7 +52,7 @@ LOOP:
 
   3. ELSE IF critical_count > 0 AND cycle < 3:
      → Auto-fix critical issues
-     → Re-run tester
+     → Re-run tester (only with `--test`/`--tdd`)
      → cycle++, LOOP
 
   4. ELSE IF critical_count > 0 AND cycle >= 3:

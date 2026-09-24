@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke to implement known scope after requirements are clear.'
 category: utilities
 keywords: [implementation, workflow, feature, pipeline]
-argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto|--no-test] [--tdd] [--advice] [--yagni] [--journal] [--skip-code-review]'
+argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto] [--test] [--tasks] [--tdd] [--advice] [--yagni] [--journal] [--skip-code-review]'
 ---
 
 # Execute - Smart Feature Implementation
@@ -27,20 +27,25 @@ End-to-end implementation with automatic workflow detection.
 - `--interactive`: Full workflow with user input (**default**)
 - `--fast`: Skip research, scout→plan→code
 - `--parallel`: Multi-agent execution
-- `--no-test`: Skip testing step
 - `--skip-code-review`: Skip the code review step
 - `--auto`: Auto-approve all steps
 
 **Composable flags** (combine with any mode):
 
+- `--test`: Opt into the testing step (Step 4). Default is to skip it
+- `--tasks`: Opt into mirroring progress to the live task-management surface.
+  Default is to track progress in plan files only
 - `--tdd`: Tests-first per phase — write tests for current behavior before
-  refactoring, then verify they still pass after the implementation step
+  refactoring, then verify they still pass after the implementation step.
+  Implies `--test`
 - `--advice`: Run under `athena` advisory supervision (see Advisory
   supervision)
 - `--yagni`: Opt into YAGNI — challenge and cut scope not needed for the stated
   outcome. Default is to implement the full requested scope
 - `--journal`: Opt into the automatic `/athena:journal` step at finalize. Default is to
   skip it
+
+Legacy `--no-test` and `--no-tasks` are accepted and ignored (already the default).
 
 **Example:**
 
@@ -128,7 +133,7 @@ Implementation is NOT done until verified to be side-effect-free. Code-review an
 4. No new lint/type/build errors anywhere in the repo.
 5. Public contracts unchanged unless intentional and called out (function signatures, exported types, API responses, DB schemas, env vars, config keys).
 
-User override: If user invoked `--no-test`, item 2 is downgraded to a warning. Surface the unverified-tests risk in the finalize `ask_user capability` so the user accepts the trade-off rather than having it silently chosen. Items 1, 3, 4, 5 remain enforceable via the `code-reviewer` subagent unless the user invoked `--skip-code-review`, in which case they are unverified — surface that risk in the finalize `ask_user capability` too.
+Testing is opt-in: unless `--test` (or `--tdd`) ran the testing step, item 2 is a warning, and the finalize report must print `tests: NOT RUN` and surface the unverified-tests risk in the finalize report — in `--auto` too — so the user sees the trade-off rather than having it silently chosen. Items 1, 3, 4, 5 remain enforceable via the `code-reviewer` subagent unless the user invoked `--skip-code-review`, in which case they are unverified — surface that risk in the finalize `ask_user capability` too.
 
 If review/testing reveals a side effect, regression, or broken workflow, STOP. Use `ask_user capability` to present:
 
@@ -162,7 +167,6 @@ Let the user decide. Do not silently patch around regressions.
 | Contains "fast", "quick"          | fast          | Skip research, scout→plan→code |
 | Contains "trust me", "auto"       | auto          | Auto-approve all steps         |
 | Lists 3+ features OR "parallel"   | parallel      | Multi-agent execution          |
-| Contains "no test", "skip test"   | no-test       | Skip testing step              |
 | Default                           | interactive   | Full workflow with user input  |
 
 See `references/intent-detection.md` for detection logic.
@@ -179,7 +183,7 @@ flowchart TD
     B -->|Yes| F[Load Plan and current evidence]
     B -->|No| C{Mode?}
     C -->|fast| D[Scout → Plan → Code]
-    C -->|interactive/auto/parallel/no-test| SC[Scout Codebase MANDATORY]
+    C -->|interactive/auto/parallel| SC[Scout Codebase MANDATORY]
     SC --> SR[Summarize Findings to User]
     SR --> RQ{Brainstorm contract concrete?<br/>outcome, constraints, non-goals, acceptance}
     RQ -->|No| SR
@@ -193,9 +197,9 @@ flowchart TD
     H1 -->|Yes| H2[Conditional Simplify]
     H1 -->|No| I[Review Gate]
     H2 --> I
-    I -->|approved| J{--no-test?}
-    J -->|No| K[Test]
-    J -->|Yes| L[Finalize]
+    I -->|approved| J{--test or --tdd?}
+    J -->|Yes| K[Test]
+    J -->|No| L[Finalize]
     K --> L
     L --> M[Report + Journal]
 ```
@@ -210,18 +214,19 @@ flowchart TD
 
 **Default (non-auto):** Stops at `[Review]` gates for human approval before each major step.
 **Auto mode (`--auto`):** Skips human review gates, implements all phases continuously.
-**Progress tracking:** Discover the live task-management surface at runtime and
-use it when available. Otherwise, update the active plan directly. Plan files
+**Progress tracking:** Only with `--tasks`, discover the live task-management
+surface at runtime and use it when available. Otherwise, update the active plan directly. Plan files
 are the durable source of truth; do not infer support from cached tool lists.
 
-| Mode        | Research | Testing | Review Gates                     | Phase Progression      |
-| ----------- | -------- | ------- | -------------------------------- | ---------------------- |
-| interactive | ✓        | ✓       | **User approval at each step**   | One at a time          |
-| auto        | ✓        | ✓       | Per `references/review-cycle.md` | All at once (no stops) |
-| fast        | ✗        | ✓       | **User approval at each step**   | One at a time          |
-| parallel    | Optional | ✓       | **User approval at each step**   | Parallel groups        |
-| no-test     | ✓        | ✗       | **User approval at each step**   | One at a time          |
-| code        | ✗        | ✓       | **User approval at each step**   | Per plan               |
+| Mode        | Research | Testing  | Review Gates                     | Phase Progression      |
+| ----------- | -------- | -------- | -------------------------------- | ---------------------- |
+| interactive | ✓        | `--test` | **User approval at each step**   | One at a time          |
+| auto        | ✓        | `--test` | Per `references/review-cycle.md` | All at once (no stops) |
+| fast        | ✗        | `--test` | **User approval at each step**   | One at a time          |
+| parallel    | Optional | `--test` | **User approval at each step**   | Parallel groups        |
+| code        | ✗        | `--test` | **User approval at each step**   | Per plan               |
+
+Testing runs only with `--test` (or `--tdd`), in every mode.
 
 ## Step Output Format
 
@@ -235,12 +240,12 @@ Human review required at these checkpoints (skipped with `--auto`):
 
 - **Post-Research:** Review findings before planning
 - **Post-Plan:** Approve plan before implementation
-- **Post-Implementation:** Approve code before testing
-- **Post-Testing:** 100% pass + approve before finalize
+- **Post-Implementation:** Approve code before testing (with `--test`) or code review
+- **Post-Testing** (only with `--test`): 100% pass + approve before finalize
 
 **Always enforced (all modes):**
 
-- **Testing:** 100% pass required (unless no-test mode)
+- **Testing (only with `--test` or `--tdd`):** 100% pass required. Otherwise print `tests skipped by default (pass --test to run)`
 - **Code Review (default; skipped only by `--skip-code-review`):** Spawn `code-reviewer` subagent with explicit checks:
   (a) every acceptance criterion met,
   (b) no regression to business logic in touchpoints/blast-radius,
@@ -250,9 +255,9 @@ Human review required at these checkpoints (skipped with `--auto`):
   Pass scout summary + acceptance criteria as context. If reviewer flags side effects → trigger HARD-GATE-NO-SIDE-EFFECTS (`ask_user capability` with 2-4 options).
   Then: user approval or the auto-mode decision in `references/review-cycle.md`.
 - **Finalize (MANDATORY - never skip):**
-  1. **Activate `/athena:project-management` skill (MANDATORY)** → run full plan sync-back across ALL `phase-XX-*.md` (not only current phase), update `plan.md` status/progress, refresh runtime tracking when available, generate progress report
+  1. **Activate `/athena:project-management` skill (MANDATORY)** → run full plan sync-back across ALL `phase-XX-*.md` (not only current phase), update `plan.md` status/progress, refresh runtime tracking when `--tasks` is present, generate progress report
   2. Evaluate docs impact; use `docs-manager` only for affected routed authority surfaces
-  3. After sync-back verification, reflect completion in the live task-management surface when available
+  3. After sync-back verification, reflect completion in the live task-management surface when `--tasks` is present
   4. Ask user if they want to commit via `git-manager` subagent
   5. Run `/athena:journal` to write a concise technical journal entry upon completion — only when the shared "Journal step — opt-in" below applies.
 
@@ -277,13 +282,13 @@ Explicit `/athena:journal` is unaffected. The rest of the Finalize block above s
 | Research | `researcher`                                                                                 | Optional in fast/code                               |
 | Scout    | `scout`                                                                                   | Optional in code                                    |
 | Plan     | `planner`                                                                                    | Optional in code                                    |
-| Testing  | `tester`, `debugger`                                                                         | **MUST** spawn                                      |
+| Testing  | `tester`, `debugger`                                                                         | **MUST** spawn with `--test`/`--tdd`                |
 | Review   | `code-reviewer`                                                                              | **MUST** spawn unless `--skip-code-review`          |
 | Finalize | `/athena:project-management`; conditional `docs-manager`; configured git workflow | Project sync and docs-impact decision are mandatory |
 
 **CRITICAL ENFORCEMENT:**
 
-- Steps 4, 5, 6 **MUST** use the live delegation capability to spawn subagents (Step 5 only when `--skip-code-review` was not passed)
+- Steps 4, 5, 6 **MUST** use the live delegation capability to spawn subagents (Step 4 only with `--test`/`--tdd`; Step 5 only when `--skip-code-review` was not passed)
 - DO NOT implement testing, review, or finalization yourself - DELEGATE
 - If workflow ends without the required delegations, it is INCOMPLETE
 - Pattern: `delegate_agent capability(subagent_type="[type]", prompt="[task]", description="[brief]")`

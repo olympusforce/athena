@@ -29,6 +29,9 @@ Project oversight and coordination with durable plan files and optional runtime 
 Discover the live task-management surface at runtime. Use it when available to
 mirror work, dependencies, ownership, and status. Otherwise, update the active
 plan directly. Never infer availability from a client name or cached tool list.
+When invoked by `/athena:exec` or `/athena:plan` without `--tasks`, skip the live view
+(no hydration or live updates) and sync plan files only; a direct
+`/athena:project-management hydrate` request is unaffected.
 Plan files are the durable source of truth, and sync-back must work without
 runtime task tracking.
 
@@ -95,7 +98,7 @@ Generate reports: session summaries, plan completion, multi-plan overviews.
 ```
 
 1. Read the durable plan and discover the live task-management surface
-2. If the live view is empty, hydrate it from unchecked plan items
+2. If the live view is empty and live tracking applies (see Runtime Capability Contract), hydrate it from unchecked plan items
 3. During work, update the live view when available; otherwise update the active plan
 4. On completion: run full-plan sync-back (all phase files, including backfill for earlier phases), then update YAML frontmatter
 5. Generate status report to reports directory

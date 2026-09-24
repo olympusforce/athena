@@ -42,7 +42,7 @@ In the active scope root:
 
 ### Task Hydration
 
-After creating plan.md and phase files, hydrate tasks (unless `--no-tasks`):
+After creating plan.md and phase files, hydrate tasks only when `--tasks` is present:
 When `--html` is present, hydrate tasks only from the companion `plan.md`
 index if it contains actionable checkboxes; otherwise skip hydration and state
 that `plan.html` is the authoritative artifact.

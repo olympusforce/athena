@@ -11,8 +11,8 @@ FUNCTION detectMode(input):
   IF input contains "--fast": RETURN "fast"
   IF input contains "--parallel": RETURN "parallel"
   IF input contains "--auto": RETURN "auto"
-  IF input contains "--no-test": RETURN "no-test"
-  # "--tdd" is composable and does not change mode selection
+  # "--test", "--tasks", "--tdd" are composable and do not change mode selection
+  # "--tdd" implies "--test"; legacy "--no-test"/"--no-tasks" are ignored
 
   # Priority 2: Plan path detection
   IF input matches path pattern (./plans/*, plan.md, phase-*.md):
@@ -26,9 +26,6 @@ FUNCTION detectMode(input):
 
   IF keywords contains ["trust me", "auto", "yolo", "just do it"]:
     RETURN "auto"
-
-  IF keywords contains ["no test", "skip test", "without test"]:
-    RETURN "no-test"
 
   # Priority 4: Complexity detection
   features = extractFeatures(input)  # comma-separated or "and"-joined items
@@ -53,14 +50,15 @@ Detect multiple features from natural language:
 
 ## Mode Behaviors
 
-| Mode        | Skip Research | Skip Test | Review Gates    | Auto-Approve          | Parallel Exec  |
-| ----------- | ------------- | --------- | --------------- | --------------------- | -------------- |
-| interactive | ✗             | ✗         | **Yes (stops)** | ✗                     | ✗              |
-| auto        | ✗             | ✗         | **No (skips)**  | Per `review-cycle.md` | ✓ (all phases) |
-| fast        | ✓             | ✗         | Yes (stops)     | ✗                     | ✗              |
-| parallel    | Optional      | ✗         | Yes (stops)     | ✗                     | ✓              |
-| no-test     | ✗             | ✓         | Yes (stops)     | ✗                     | ✗              |
-| code        | ✓             | ✗         | Yes (stops)     | Per plan              | Per plan       |
+| Mode        | Skip Research | Review Gates    | Auto-Approve          | Parallel Exec  |
+| ----------- | ------------- | --------------- | --------------------- | -------------- |
+| interactive | ✗             | **Yes (stops)** | ✗                     | ✗              |
+| auto        | ✗             | **No (skips)**  | Per `review-cycle.md` | ✓ (all phases) |
+| fast        | ✓             | Yes (stops)     | ✗                     | ✗              |
+| parallel    | Optional      | Yes (stops)     | ✗                     | ✓              |
+| code        | ✓             | Yes (stops)     | Per plan              | Per plan       |
+
+**Testing:** runs only with `--test` (or `--tdd`) in every mode; default is to skip it.
 
 **Review Gates:** Human approval checkpoints between major steps (see `workflow-steps.md`).
 

@@ -1,7 +1,7 @@
 {
   "name": "athena",
   "description": "Disciplined delivery pipeline for Claude Code as /athena: skills (plan, exec, fix, debug, code-review, ship, git, ...), 16 model-tiered subagents, 6 output styles, and always-on rules delivered by a SessionStart hook or /athena:setup.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "olympusforce"
   },

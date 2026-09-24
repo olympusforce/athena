@@ -14,8 +14,8 @@ becoming a dependency.
 
 ## When to Hydrate
 
-Hydrate by default after writing a plan with at least three meaningful phases.
-Skip when `--no-tasks` is requested or when the plan is too small to benefit.
+Hydrate only when `--tasks` is requested and the plan has at least three
+meaningful phases. By default, keep progress in plan files only.
 
 For an HTML-authoritative plan, hydrate only from a companion Markdown index
 that contains actionable checkboxes. Otherwise, leave runtime tracking empty.
@@ -31,7 +31,7 @@ that contains actionable checkboxes. Otherwise, leave runtime tracking empty.
 
 ## Exec Handoff
 
-In the same session, Exec may reuse the live view after confirming it matches
+Without `--tasks`, Exec tracks progress in plan files only. With `--tasks`, in the same session, Exec may reuse the live view after confirming it matches
 the plan. In a new session, or when the view is absent or stale, Exec rebuilds
 it from unchecked plan items. The plan always wins when states disagree.
 

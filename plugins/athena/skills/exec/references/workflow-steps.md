@@ -2,8 +2,9 @@
 
 All modes share core steps with mode-specific variations.
 
-**Runtime progress contract:** Discover the live task-management surface and use
-it when available. Otherwise, update the active plan directly. Plan files are
+**Runtime progress contract:** Runtime task tracking is opt-in via `--tasks`.
+With `--tasks`, discover the live task-management surface and use it when
+available. Otherwise, update the active plan directly. Plan files are
 the durable source of truth, and every workflow step must work without runtime
 task tracking.
 
@@ -16,7 +17,7 @@ task tracking.
 3. Parse input with `intent-detection.md` rules.
 4. If mode=code: detect plan path, set active plan, and retain its accepted
    brainstorm contract.
-5. For three or more meaningful steps, mirror progress into the live task-management surface when available.
+5. With `--tasks` and three or more meaningful steps, mirror progress into the live task-management surface when available. Without `--tasks`, print `task tracking skipped by default (pass --tasks to enable)`.
 
 **Output:** concise brainstorm contract plus detected workflow mode and reason.
 
@@ -43,7 +44,7 @@ task tracking.
 
 ## Step 2: Planning
 
-**Interactive/Auto/No-test:**
+**Interactive/Auto:**
 
 - Use `planner` agent with research context
 - Create `plan.md` + `phase-XX-*.md` files
@@ -79,8 +80,8 @@ task tracking.
 **IMPORTANT:**
 
 1. Read the active plan before trusting session state.
-2. Discover the live task-management surface and compare any existing view with the plan.
-3. If the view is absent or stale, rebuild it from unchecked plan items when supported.
+2. With `--tasks`, discover the live task-management surface and compare any existing view with the plan.
+3. With `--tasks`, if the view is absent or stale, rebuild it from unchecked plan items when supported.
 4. Preserve phase order, dependencies, ownership, and source-plan mapping; otherwise track them in the active plan.
 
 ### Conformance Checklist (before writing code)
@@ -119,14 +120,14 @@ the refactor broke something and must be fixed before the workflow proceeds.
 
 **All modes:**
 
-- Record the current item as active through the live task-management surface when available; otherwise update the active plan.
+- Record the current item as active through the live task-management surface when `--tasks` is present; otherwise update the active plan.
 - Execute phase tasks sequentially (Step 3.1, 3.2, etc.)
 - Use `designer` for frontend
 - Run type checking after each file
 
 **Parallel mode:**
 
-- Discover the live task-management surface before using it; do not rely on copied tool names or client restrictions.
+- With `--tasks`, discover the live task-management surface before using it; do not rely on copied tool names or client restrictions.
 - Launch multiple `executor` agents
 - When agents pick up work, record ownership and active state through the live capability or active plan.
 - Respect file ownership boundaries
@@ -164,12 +165,14 @@ After the subagent returns, log only — never re-run or block:
 ### [Review Gate 3] Post-Implementation (skip if auto mode)
 
 - Present implementation summary (files changed, key changes)
-- Use `ask_user capability` to ask: "Proceed to testing?" / "Request implementation changes" / "Abort"
+- Use `ask_user capability` to ask: "Proceed to testing (with `--test`) / code review?" / "Request implementation changes" / "Abort"
 - **Auto mode:** Skip this gate
 
-## Step 4: Testing (skip if no-test mode)
+## Step 4: Testing (only with `--test` or `--tdd`)
 
-**All modes (except no-test):**
+**Without `--test` or `--tdd`:** print `tests skipped by default (pass --test to run)` and continue to Step 5.
+
+**All modes (with `--test`):**
 
 - Write tests: happy path, edge cases, errors
 - **MUST** spawn `tester` subagent: `delegate_agent capability(subagent_type="athena:tester", prompt="Run test suite", description="Run tests")`
@@ -178,7 +181,7 @@ After the subagent returns, log only — never re-run or block:
 
 **Output:** `✓ Step 4: Tests [X/X passed] - tester subagent invoked`
 
-### [Review Gate 4] Post-Testing (skip if auto mode)
+### [Review Gate 4] Post-Testing (only with `--test`; skip if auto mode)
 
 - Present test results summary
 - Use `ask_user capability` to ask: "Proceed to code review?" / "Request test fixes" / "Abort"
@@ -196,9 +199,9 @@ After the subagent returns, log only — never re-run or block:
   ```
 - **DO NOT** review code yourself - delegate to subagent
 
-**`--skip-code-review`:** Skip this entire step. Print `code review skipped by --skip-code-review` and surface the unreviewed-changes risk in the Step 6 finalize report, the same way `--no-test` surfaces its risk.
+**`--skip-code-review`:** Skip this entire step. Print `code review skipped by --skip-code-review` and surface the unreviewed-changes risk in the Step 6 finalize report, the same way skipped testing surfaces its risk.
 
-**Interactive/Parallel/Code/No-test:**
+**Interactive/Parallel/Code:**
 
 - Interactive cycle (max 3): see `review-cycle.md`
 - Requires user approval
@@ -239,9 +242,10 @@ syntax and effects; do not copy an argument schema into this workflow.
 - Update `plan.md` status/progress (`pending`/`in-progress`/`completed`) from actual checkbox state.
 - Return unresolved mappings if any completed task cannot be matched to a phase file.
 
-4. After sync-back confirmation, reflect completion in the live task-management surface when available.
-5. Onboarding check (API keys, env vars)
-6. **MUST** spawn git subagent: `delegate_agent capability(subagent_type="athena:git-manager", prompt="Stage and commit changes", description="Commit")`
+4. After sync-back confirmation, reflect completion in the live task-management surface when `--tasks` is present.
+5. If Step 4 did not run, print `tests: NOT RUN` in the finalize report (all modes, including auto).
+6. Onboarding check (API keys, env vars)
+7. **MUST** spawn git subagent: `delegate_agent capability(subagent_type="athena:git-manager", prompt="Stage and commit changes", description="Commit")`
 
 **CRITICAL:** Step 6 is incomplete without project-management sync-back, an
 explicit docs-impact decision, and the configured git approval flow.
@@ -253,14 +257,13 @@ explicit docs-impact decision, and the configured git approval flow.
 
 ## Mode-Specific Flow Summary
 
-Legend: `[R]` = Review Gate (human approval required)
+Legend: `[R]` = Review Gate (human approval required); `4` and its `[R]` run only with `--test`/`--tdd`
 
 ```
 interactive: 0 → 1 → [R] → 2 → [R] → 3 → [R] → 4 → [R] → 5(user) → 6
 auto:        0 → 1 → 2 → 3 → 4 → 5(auto) → 6 → next phase (NO stops)
 fast:        0 → skip → 2(fast) → [R] → 3 → [R] → 4 → [R] → 5(simple) → 6
 parallel:    0 → 1? → [R] → 2(parallel) → [R] → 3(multi-agent) → [R] → 4 → [R] → 5(user) → 6
-no-test:     0 → 1 → [R] → 2 → [R] → 3 → [R] → skip → 5(user) → 6
 code:        0 → skip → skip → 3 → [R] → 4 → [R] → 5(user) → 6
 ```
 
@@ -270,11 +273,11 @@ code:        0 → skip → skip → 3 → [R] → 4 → [R] → 5(user) → 6
 
 - Never skip steps without mode justification
 - **MANDATORY DELEGATION:** Steps 4, 5, 6 MUST delegate via delegate_agent capability / skill activation. DO NOT implement directly.
-  - Step 4: `tester` (and `debugger` if failures)
+  - Step 4 (with `--test`/`--tdd`): `tester` (and `debugger` if failures)
   - Step 5: `code-reviewer` (unless `--skip-code-review`)
   - Step 6: `/athena:project-management`, conditional `docs-manager`, `git-manager`
-- Discover the live task-management surface before using runtime tracking.
-- If available, mirror unchecked plan items and keep their status current.
-- If unavailable, update the active plan directly; plan files remain authoritative.
+- Runtime tracking only with `--tasks`: discover the live task-management surface first.
+- With `--tasks` and a live surface, mirror unchecked plan items and keep their status current.
+- Otherwise, update the active plan directly; plan files remain authoritative.
 - All step outputs follow format: `✓ Step [N]: [status] - [metrics]`
 - **VALIDATION:** If delegate_agent calls = 0 at end of workflow, the workflow is INCOMPLETE.

@@ -118,9 +118,11 @@ refers to a command that exists.
 | [`/athena:ctx`](plugins/athena/skills/ctx/SKILL.md) <sup>†</sup> | Compact the conversation while preserving plans and todos |
 | [`/athena:setup`](plugins/athena/skills/setup/SKILL.md) <sup>†</sup> | Write the always-on rules into `.claude/rules/` (plugin-only) |
 
-Flags (`--yagni`, `--advice`, `--journal`, `--no-test`, `--skip-code-review`,
-`--tdd`) and per-skill modes are unchanged from the kit; each `SKILL.md`
-frontmatter is the authority.
+Flags (`--yagni`, `--advice`, `--journal`, `--test`, `--tasks`,
+`--skip-code-review`, `--tdd`) and per-skill modes are unchanged from the kit;
+each `SKILL.md` frontmatter is the authority. Testing (`--test`) and task
+tracking (`--tasks`) are opt-in; `/athena:ship` still runs tests unless
+`--skip-tests`.
 
 ## Agents
 

@@ -52,7 +52,7 @@ When verifying task completeness:
 
 1. **Acceptance criteria met?** — Check against plan requirements
 2. **Code quality validated?** — code-reviewer agent report available?
-3. **Tests passing?** — tester agent report confirms 100% pass?
+3. **Tests passing?** — tester agent report confirms 100% pass? (Only when tests ran via `--test`/`--tdd`; otherwise record `tests: NOT RUN`.)
 4. **Documentation updated?** — docs match implementation?
 5. **No regressions?** — Existing functionality intact?
 

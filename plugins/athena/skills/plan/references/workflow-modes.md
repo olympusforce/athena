@@ -30,26 +30,26 @@ cut.
 
 ## Fast Mode (`--fast`)
 
-No research. Analyze → Plan → Hydrate Tasks. Fast mode reduces workflow
+No research. Analyze → Plan → Hydrate Tasks (`--tasks`). Fast mode reduces workflow
 depth, not the requested product scope.
 
 1. Read repository instructions and follow the existing documentation navigation to locate current requirements, architecture, and development standards; confirm them against relevant source and tests
 2. Use `planner` subagent to create plan
-3. Hydrate tasks (unless `--no-tasks`)
+3. Hydrate tasks (only with `--tasks`)
 4. **Implementation option:** `/athena:exec {absolute-plan-path}/plan.md`
 
 **Why no default execute automation?** Fast planning reduces planning overhead, but implementation still requires a user choice. Add `--auto` only when the user explicitly asks to skip execute review gates.
 
 ## Hard Mode (`--hard`)
 
-Research → Scout → Plan → Red Team → Validate → Hydrate Tasks.
+Research → Scout → Plan → Red Team → Validate → Hydrate Tasks (`--tasks`).
 
 1. Spawn max 2 `researcher` agents in parallel (different aspects, max 5 calls each)
 2. Read repository instructions and follow documentation navigation to the relevant requirements, architecture, and standards; use `/athena:scout` when owning evidence is missing, ambiguous, or conflicts with source and tests
 3. Gather research + scout report filepaths → pass to `planner` subagent
 4. Post-plan red team review (see Red Team Review section below)
 5. Post-plan validation (see Validation section below)
-6. Hydrate tasks (unless `--no-tasks`)
+6. Hydrate tasks (only with `--tasks`)
 7. **Context reminder:** `/athena:exec {absolute-plan-path}/plan.md`
 
 **Why no execute flag?** Thorough planning needs interactive review gates.
@@ -58,7 +58,7 @@ Research → Scout → Plan → Red Team → Validate → Hydrate Tasks.
 
 For major refactors touching 5+ areas with meaningful architectural debt.
 
-Research → Per-phase scouting → Plan → Red Team → Validate → Hydrate Tasks.
+Research → Per-phase scouting → Plan → Red Team → Validate → Hydrate Tasks (`--tasks`).
 
 1. Spawn 2-3 `researcher` agents for high-level architecture analysis
 2. Follow repository instructions and documentation navigation to relevant authorities, verify them against current source and tests, and use `/athena:scout` across affected areas
@@ -70,7 +70,7 @@ Research → Per-phase scouting → Plan → Red Team → Validate → Hydrate T
 4. Planner embeds the scout data into each phase file
 5. Run red-team review
 6. Run validation
-7. Hydrate tasks unless `--no-tasks`
+7. Hydrate tasks only with `--tasks`
 8. Output the standard `/athena:exec {absolute-plan-path}/plan.md` reminder
 
 ### Deep Phase Requirements
@@ -106,7 +106,7 @@ Each TDD phase should include:
 
 ## Parallel Mode (`--parallel`)
 
-Research → Scout → Plan with file ownership → Red Team → Validate → Hydrate Tasks with dependency graph.
+Research → Scout → Plan with file ownership → Red Team → Validate → Hydrate Tasks with dependency graph (`--tasks`).
 
 1. Same as Hard mode steps 1-3
 2. Planner creates phases with:
@@ -114,7 +114,7 @@ Research → Scout → Plan with file ownership → Red Team → Validate → Hy
    - **Dependency matrix** (which phases run concurrently vs sequentially)
    - **Conflict prevention** strategy
 3. plan.md includes: dependency graph, execution strategy, file ownership matrix
-4. Hydrate progress when supported: preserve sequential dependencies and leave parallel groups independent
+4. With `--tasks`, hydrate progress when supported: preserve sequential dependencies and leave parallel groups independent
 5. Post-plan red team review
 6. Post-plan validation
 7. **Context reminder:** `/athena:exec --parallel {absolute-plan-path}/plan.md`
@@ -128,7 +128,7 @@ Research → Scout → Plan with file ownership → Red Team → Validate → Hy
 
 ## Two-Approach Mode (`--two`)
 
-Research → Scout → Plan 2 approaches → Compare → Hydrate Tasks.
+Research → Scout → Plan 2 approaches → Compare → Hydrate Tasks (`--tasks`).
 
 1. Same as Hard mode steps 1-3
 2. Planner creates 2 implementation approaches with:
@@ -137,10 +137,12 @@ Research → Scout → Plan 2 approaches → Compare → Hydrate Tasks.
 3. User selects approach
 4. Post-plan red team review on selected approach
 5. Post-plan validation
-6. Hydrate tasks for selected approach (unless `--no-tasks`)
+6. Hydrate tasks for selected approach (only with `--tasks`)
 7. **Context reminder:** `/athena:exec {absolute-plan-path}/plan.md`
 
 ## Task Hydration Per Mode
+
+Applies only when `--tasks` is present.
 
 | Mode     | Task Granularity              | Dependency Pattern                |
 | -------- | ----------------------------- | --------------------------------- |

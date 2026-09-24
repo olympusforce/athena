@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke when work needs phases, architecture, or a roadmap.'
 category: utilities
 keywords: [planning, architecture, phases, roadmap, html, github, wiki, agentwiki, publish]
-argument-hint: '[task] [--fast|--hard|--deep|--parallel|--two] [--tdd|--no-tasks] [--html] [--github] [--wiki] [--advice] [--yagni] [--journal] OR [archive|red-team|validate]'
+argument-hint: '[task] [--fast|--hard|--deep|--parallel|--two] [--tdd] [--tasks] [--test] [--html] [--github] [--wiki] [--advice] [--yagni] [--journal] OR [archive|red-team|validate]'
 ---
 
 # Planning
@@ -164,7 +164,8 @@ Default: auto-detect planning mode (analyze task complexity and pick mode).
 | Flag         | Effect                                                                                                                                                                                                          |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--tdd`      | Add tests-first structure to each phase for regression-safe refactors                                                                                                                                           |
-| `--no-tasks` | Skip task hydration                                                                                                                                                                                             |
+| `--tasks`    | Opt into task hydration: mirror phases to the live task-management surface. Default: skip; plan files only                                                                                                      |
+| `--test`     | Forward to `/athena:exec` on handoff to opt into its testing step. Default: exec skips testing                                                                                                                  |
 | `--html`     | Output a self-contained editorial interactive HTML plan with visible phase outlines, markdown detail modals, and optional generated watercolor technical sketch imagery                                         |
 | `--github`   | Create or update a GitHub issue after plan validation with branch, summary, plan links, open questions, and `ready to review`                                                                                   |
 | `--wiki`     | Publish the final reviewed plan docs or HTML artifact via CLI or MCP when available                                                                                                                |
@@ -400,9 +401,11 @@ flowchart TD
     V --> L[Validation Interview]
     L --> X
     X -->|Yes| Y[Activate frontend-design<br/>Write plan.html]
-    X -->|No| M[Hydrate Tasks]
-    Y --> M
-    M --> Q{GitHub?}
+    X -->|No| T{--tasks?}
+    Y --> T
+    T -->|Yes| M[Hydrate Tasks]
+    T -->|No| Q{GitHub?}
+    M --> Q
     Q -->|Yes| R[Create or update issue<br/>Label ready to review]
     Q -->|No| W{Wiki?}
     R --> W
@@ -429,7 +432,7 @@ flowchart TD
 6. **Red Team Review** → Run `/athena:plan red-team {plan-path}` (hard/deep/parallel/two modes)
 7. **Post-Plan Validation** → Run `/athena:plan validate {plan-path}` (hard/deep/parallel/two modes)
 8. **HTML Artifact** → If `--html`, activate `/athena:frontend-design` and write final reviewed `plan.html` as the primary output
-9. **Hydrate Progress** → Mirror phases into live task management when available (default on, `--no-tasks` to skip)
+9. **Hydrate Progress** → Only with `--tasks`: mirror phases into live task management when available. Otherwise print `task tracking skipped by default (pass --tasks to enable)`
 10. **GitHub Issue** → If `--github`, create/update issue and apply `ready to review`
 11. **AgentWiki Publish** → If `--wiki`, publish final docs privately or upload `plan.html` only when AgentWiki CLI/MCP is available and the requested visibility permits it
 12. **Boundary Reminder** → Present optional next-step commands with absolute path
@@ -477,8 +480,8 @@ If unresolved contradictions remain, report them and ask the user. Do not recomm
 
 Plan files are the durable source of truth. Runtime task views may be session-scoped; hydration mirrors the plan without replacing it.
 
-**Default:** After writing plan files, discover the live task-management surface and mirror phases there when available. Skip with `--no-tasks`.
-**3-Item Rule:** Fewer than 3 phases → skip runtime tracking.
+**Default:** Skip runtime tracking; plan files only. With `--tasks`, discover the live task-management surface after writing plan files and mirror phases there when available. Legacy `--no-tasks` is accepted and ignored.
+**3-Item Rule:** With `--tasks`, fewer than 3 phases → still skip runtime tracking.
 **Fallback:** If no live surface exists, update the active plan directly. Planning and handoff remain fully functional.
 
 Load: `references/task-management.md` for the hydration and exec handoff protocol.
@@ -541,7 +544,7 @@ After `plan.md` + phase files are written and the user has reviewed/approved the
 - Omit `/athena:plan validate` from the offered options when mode is `--deep` (Step 7 already ran validation).
 - If both gates already ran, the Post-Plan Handoff still fires but offers only `/athena:exec <plan-path>` and `End session`.
 
-After selection: invoke the chosen command with the plan path as argument for continuity.
+After selection: invoke the chosen command with the plan path as argument for continuity. Forward `--tasks` / `--test` (and `--advice` / `--yagni`) to `/athena:exec` when the user passed them.
 
 ## Quality Standards
 
