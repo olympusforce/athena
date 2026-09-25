@@ -18,7 +18,7 @@ keywords:
     html,
     report,
   ]
-argument-hint: '[prompt-or-url] [--html] [--md] [--wiki] [--github] [--agent] [--yagni]'
+argument-hint: '[prompt-or-url] [--html] [--md] [--wiki] [--github] [--agent] [--yagni] [--recommended]'
 ---
 
 # Advise
@@ -170,7 +170,8 @@ question back to you and is re-spawned with the answer. Loop:
    - Starts with `NEEDS_USER_INPUT`: parse the fenced `json` block that follows and <!-- capability-lint-allow: --agent relay is Claude Code-only; naming the native AskUserQuestion tool is intentional here -->
      pass it VERBATIM as the single question to `AskUserQuestion`. Then go to
      step 2 and re-spawn the advisor with the user's answer. Do not reword the
-     question or invent options.
+     question or invent options. With `--recommended`, answer it yourself per
+     the `recommended-answers` rule (log it first), then re-spawn.
    - Starts with `ADVICE_READY: <path>`: read that report, present the advice to
      the user, then run step 6 (Emit outputs per flags) against it. Done.
    - Starts with `ADVISE_SKILL_NOT_FOUND` or any other error: surface it and stop;

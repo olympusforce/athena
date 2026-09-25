@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke when work needs phases, architecture, or a roadmap.'
 category: utilities
 keywords: [planning, architecture, phases, roadmap, html, github, wiki, agentwiki, publish]
-argument-hint: '[task] [--fast|--hard|--deep|--parallel|--two] [--tdd] [--tasks] [--test] [--html] [--github] [--wiki] [--advice] [--yagni] [--journal] OR [archive|red-team|validate]'
+argument-hint: '[task] [--fast|--hard|--deep|--parallel|--two] [--tdd] [--tasks] [--test] [--html] [--github] [--wiki] [--advice] [--yagni] [--journal] [--recommended] OR [archive|red-team|validate]'
 ---
 
 # Planning
@@ -172,6 +172,7 @@ Default: auto-detect planning mode (analyze task complexity and pick mode).
 | `--advice`   | Run under `athena` advisory supervision (see Advisory Supervision Mode)                                                                                                                                       |
 | `--yagni`    | Opt into YAGNI: challenge and cut scope not needed for the stated outcome (default: plan the full requested scope). Forward it to every subagent prompt and downstream skill, or the opt-in dies at the handoff |
 | `--journal`  | Opt into the automatic `/athena:journal` step at the end of the workflow. Default is to skip it                                                                                                                        |
+| `--recommended` | Auto-take the recommended answer for every clarification (scope challenge, validate interview, handoff) and log each to `{plan-dir}/decisions.md` per the always-on `recommended-answers` rule. Forward it downstream |
 
 ### Advisory Supervision Mode (`--advice`)
 
@@ -544,7 +545,7 @@ After `plan.md` + phase files are written and the user has reviewed/approved the
 - Omit `/athena:plan validate` from the offered options when mode is `--deep` (Step 7 already ran validation).
 - If both gates already ran, the Post-Plan Handoff still fires but offers only `/athena:exec <plan-path>` and `End session`.
 
-After selection: invoke the chosen command with the plan path as argument for continuity. Forward `--tasks` / `--test` (and `--advice` / `--yagni`) to `/athena:exec` when the user passed them.
+After selection: invoke the chosen command with the plan path as argument for continuity. Forward `--tasks` / `--test` (and `--advice` / `--yagni` / `--recommended`) to `/athena:exec` when the user passed them. With `--recommended`, take the recommended option, log it to `decisions.md`, and link `decisions.md` from `plan.md`.
 
 ## Quality Standards
 

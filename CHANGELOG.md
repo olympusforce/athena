@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.0 — unreleased
+
+- **Default change:** `/athena:exec` and `/athena:fix` no longer run code review by default. Pass `--code-review` to run it; `--skip-code-review` is accepted as a no-op. Finalize prints `code review: NOT RUN`. `/athena:ship` still reviews unless `--skip-review`.
+- `--recommended` (any athena skill): the model takes its recommended answer to each clarification question instead of asking, and logs every choice to `decisions.md` in the plan dir (or `.athena/plans/reports/decisions-*.md`). It still asks before irreversible or outward-facing actions, credentials, or questions with no defensible default. Defined by the new always-on `recommended-answers` rule.
+
 ## 1.3.0 — unreleased
 
 - Update notice: at startup, when a newer athena is published, a one-line message shows the update commands and the CHANGELOG link. Checked at most once per 24h (cached), 2s timeout, silent offline or on error. Opt out with `ATHENA_NO_UPDATE_CHECK=1`.

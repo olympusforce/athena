@@ -67,6 +67,7 @@ Use `ask_user capability` tool.
 - Use question count from `## Plan Context` validation settings
 - Group related questions (max 4 per tool call)
 - Focus on: assumptions, risks, tradeoffs, architecture
+- With `--recommended`: answer each question per the always-on `recommended-answers` rule (it logs to `{plan-dir}/decisions.md`), then continue to Step 5 as if the user had answered
 
 ### Step 5: Document Answers
 

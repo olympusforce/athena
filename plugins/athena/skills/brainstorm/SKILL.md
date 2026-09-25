@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Use at the opening of multi-step delivery or when a diagnosed problem has meaningful solution choices.'
 category: utilities
 keywords: [ideation, tradeoffs, decisions, intent, acceptance]
-argument-hint: '[topic or problem] [--advice] [--html] [--yagni]'
+argument-hint: '[topic or problem] [--advice] [--html] [--yagni] [--recommended]'
 ---
 
 # Brainstorm

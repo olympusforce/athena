@@ -15,7 +15,7 @@ task-management surface when available; otherwise keep it in the active plan.
 - Diagnose root cause
 - Implement fix, blocked by scout + diagnose
 - Verify + prevent, blocked by implementation
-- Code review, blocked by verification
+- Code review (only with `--code-review`), blocked by verification
 - Finalize, blocked by review
 
 ## Steps
@@ -97,7 +97,7 @@ Record the verify phase as completed only after fresh evidence passes.
 
 ### Step 5: Code Review
 
-**Skip if:** `--skip-code-review`. Print `code review skipped by --skip-code-review`, surface the unreviewed-changes risk at finalize, and continue to Step 6.
+**Skip unless:** `--code-review`. Print `code review skipped by default (pass --code-review to run)`, surface `code review: NOT RUN (pass --code-review)` and the unreviewed-changes risk at finalize, and continue to Step 6.
 
 Record the review phase as active.
 Use `code-reviewer` through `delegate_agent` when delegation is explicitly
@@ -106,7 +106,7 @@ requested/permitted; otherwise review the changed files locally.
 See `references/review-cycle.md` for mode-specific handling.
 
 Record the review phase as completed after accepted findings are resolved.
-**Output:** `✓ Step 5: Review [score]/10 - [status]`
+**Output:** `✓ Step 5: Review [score]/10 - [status]` (or `✓ Step 5: Review skipped - pass --code-review to run`)
 
 ### Step 6: Finalize
 
@@ -129,7 +129,7 @@ Record the finalize phase as completed in the live surface when available and in
 | 2    | `debug`, `sequential-thinking`, optional delegated debugger/ghost-rider when permitted, (`problem-solving` auto), conditional `brainstorm` after diagnosis |
 | 3    | `problem-solving` (if stuck), `sequential-thinking` (complex logic)                                                                                          |
 | 4    | `run_shell` verification; optional delegated tester/workers when permitted                                                                                         |
-| 5    | `code-reviewer` via `delegate_agent` when permitted, otherwise local review (skipped by `--skip-code-review`)                                                       |
+| 5    | `code-reviewer` via `delegate_agent` when permitted, otherwise local review (only with `--code-review`)                                                           |
 | 6    | `project-management`; docs/git delegation only when permitted                                                                                                   |
 
 **Rules:** Don't skip steps. Validate before proceeding. One phase at a time.

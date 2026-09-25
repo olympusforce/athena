@@ -165,7 +165,7 @@ After the subagent returns, log only — never re-run or block:
 ### [Review Gate 3] Post-Implementation (skip if auto mode)
 
 - Present implementation summary (files changed, key changes)
-- Use `ask_user capability` to ask: "Proceed to testing (with `--test`) / code review?" / "Request implementation changes" / "Abort"
+- Use `ask_user capability` to ask: "Proceed to testing (with `--test`) / code review (with `--code-review`) / finalize?" / "Request implementation changes" / "Abort"
 - **Auto mode:** Skip this gate
 
 ## Step 4: Testing (only with `--test` or `--tdd`)
@@ -184,12 +184,14 @@ After the subagent returns, log only — never re-run or block:
 ### [Review Gate 4] Post-Testing (only with `--test`; skip if auto mode)
 
 - Present test results summary
-- Use `ask_user capability` to ask: "Proceed to code review?" / "Request test fixes" / "Abort"
+- Use `ask_user capability` to ask: "Proceed to code review (with `--code-review`) / finalize?" / "Request test fixes" / "Abort"
 - **Auto mode:** Skip this gate
 
-## Step 5: Code Review
+## Step 5: Code Review (only with `--code-review`)
 
-**All modes - MANDATORY subagent (skipped only by `--skip-code-review`):**
+**Without `--code-review`:** print `code review skipped by default (pass --code-review to run)`, surface the unreviewed-changes risk in the Step 6 finalize report (`code review: NOT RUN`), the same way skipped testing surfaces its risk, and continue to Step 6.
+
+**All modes (with `--code-review`) - MANDATORY subagent:**
 
 - **MUST** spawn `code-reviewer` subagent with explicit (a-e) checks and scout/acceptance context:
   ```
@@ -198,8 +200,6 @@ After the subagent returns, log only — never re-run or block:
        description="Code review")
   ```
 - **DO NOT** review code yourself - delegate to subagent
-
-**`--skip-code-review`:** Skip this entire step. Print `code review skipped by --skip-code-review` and surface the unreviewed-changes risk in the Step 6 finalize report, the same way skipped testing surfaces its risk.
 
 **Interactive/Parallel/Code:**
 
@@ -217,7 +217,7 @@ After the subagent returns, log only — never re-run or block:
 - Simplified review, no fix loop
 - User approves or aborts
 
-**Output:** `✓ Step 5: Review [score]/10 - [Approved|Auto-approved] - code-reviewer subagent invoked`
+**Output:** `✓ Step 5: Review [score]/10 - [Approved|Auto-approved] - code-reviewer subagent invoked` (or `✓ Step 5: Review skipped - pass --code-review to run`)
 
 ## Step 6: Finalize
 
@@ -244,8 +244,9 @@ syntax and effects; do not copy an argument schema into this workflow.
 
 4. After sync-back confirmation, reflect completion in the live task-management surface when `--tasks` is present.
 5. If Step 4 did not run, print `tests: NOT RUN` in the finalize report (all modes, including auto).
-6. Onboarding check (API keys, env vars)
-7. **MUST** spawn git subagent: `delegate_agent capability(subagent_type="athena:git-manager", prompt="Stage and commit changes", description="Commit")`
+6. If Step 5 did not run, print `code review: NOT RUN (pass --code-review)` and the unreviewed-changes risk in the finalize report (all modes, including auto).
+7. Onboarding check (API keys, env vars)
+8. **MUST** spawn git subagent: `delegate_agent capability(subagent_type="athena:git-manager", prompt="Stage and commit changes", description="Commit")`
 
 **CRITICAL:** Step 6 is incomplete without project-management sync-back, an
 explicit docs-impact decision, and the configured git approval flow.
@@ -257,7 +258,7 @@ explicit docs-impact decision, and the configured git approval flow.
 
 ## Mode-Specific Flow Summary
 
-Legend: `[R]` = Review Gate (human approval required); `4` and its `[R]` run only with `--test`/`--tdd`
+Legend: `[R]` = Review Gate (human approval required); `4` and its `[R]` run only with `--test`/`--tdd`; `5` runs only with `--code-review`
 
 ```
 interactive: 0 → 1 → [R] → 2 → [R] → 3 → [R] → 4 → [R] → 5(user) → 6
@@ -274,7 +275,7 @@ code:        0 → skip → skip → 3 → [R] → 4 → [R] → 5(user) → 6
 - Never skip steps without mode justification
 - **MANDATORY DELEGATION:** Steps 4, 5, 6 MUST delegate via delegate_agent capability / skill activation. DO NOT implement directly.
   - Step 4 (with `--test`/`--tdd`): `tester` (and `debugger` if failures)
-  - Step 5: `code-reviewer` (unless `--skip-code-review`)
+  - Step 5 (with `--code-review`): `code-reviewer`
   - Step 6: `/athena:project-management`, conditional `docs-manager`, `git-manager`
 - Runtime tracking only with `--tasks`: discover the live task-management surface first.
 - With `--tasks` and a live surface, mirror unchecked plan items and keep their status current.

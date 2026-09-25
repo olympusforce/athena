@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke to review diffs, PRs, commits, or full codebases.'
 category: utilities
 keywords: [review, quality, verification, reliability]
-argument-hint: '[#PR | COMMIT | --pending | codebase [parallel]] [--yagni]'
+argument-hint: '[#PR | COMMIT | --pending | codebase [parallel]] [--yagni] [--recommended]'
 ---
 
 # Code Review

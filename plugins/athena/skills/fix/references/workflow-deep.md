@@ -21,7 +21,7 @@ runtime permits the needed delegation.
 - Create implementation plan, blocked by brainstorm
 - Implement fix, blocked by plan
 - Verify + prevent, blocked by implementation
-- Code review, blocked by verification
+- Code review (only with `--code-review`), blocked by verification
 - Finalize & docs, blocked by review
 
 ## Steps
@@ -135,7 +135,7 @@ Record verification as completed only after fresh evidence passes.
 
 ### Step 8: Code Review
 
-**Skip if:** `--skip-code-review`. Print `code review skipped by --skip-code-review`, surface the unreviewed-changes risk at finalize, and continue to Step 9.
+**Skip unless:** `--code-review`. Print `code review skipped by default (pass --code-review to run)`, surface `code review: NOT RUN (pass --code-review)` and the unreviewed-changes risk at finalize, and continue to Step 9.
 
 Record review as active.
 Use delegated `code-reviewer` only when delegation is explicitly requested/permitted; otherwise review locally.
@@ -143,7 +143,7 @@ Use delegated `code-reviewer` only when delegation is explicitly requested/permi
 See `references/review-cycle.md` for mode-specific handling.
 
 Record review as completed after accepted findings are resolved.
-**Output:** `✓ Step 8: Review [score]/10 - [status]`
+**Output:** `✓ Step 8: Review [score]/10 - [status]` (or `✓ Step 8: Review skipped - pass --code-review to run`)
 
 ### Step 9: Finalize
 
@@ -169,7 +169,7 @@ Record finalization as completed in the live surface when available and in the a
 | 5    | `planner`                                                                                                    |
 | 6    | `problem-solving`, `sequential-thinking`, `context-engineering`                                     |
 | 7    | `run_shell` verification; optional delegated tester when permitted                                           |
-| 8    | `code-reviewer` via `delegate_agent` when permitted, otherwise local review (skipped by `--skip-code-review`) |
+| 8    | `code-reviewer` via `delegate_agent` when permitted, otherwise local review (only with `--code-review`) |
 | 9    | `project-management`; docs/git delegation only when permitted                                             |
 
 **Rules:** Don't skip steps. Validate before proceeding. One phase at a time.

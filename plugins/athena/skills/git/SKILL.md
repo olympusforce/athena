@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke for commits, PRs, stacked PRs, branch hygiene, or release git steps.'
 category: dev-tools
 keywords: [git, commits, staging, PR, merge, merge-pr, stack, stacked-prs, ci]
-argument-hint: 'cm|cp|pr|merge|merge-pr|stack|<#N|PR N|pr-url> [args] [--watch] [--no-ai|--ai-signature]'
+argument-hint: 'cm|cp|pr|merge|merge-pr|stack|<#N|PR N|pr-url> [args] [--watch] [--no-ai|--ai-signature] [--recommended]'
 ---
 
 # Git Operations

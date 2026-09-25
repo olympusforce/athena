@@ -54,7 +54,7 @@ See `references/parallel-exploration.md` for patterns.
 
 ### Step 4: Review + Prevent
 
-**Skip the review sub-step if:** `--skip-code-review`. Print `code review skipped by --skip-code-review` and surface the unreviewed-changes risk at finalize; the Prevention sub-steps below still run.
+**Skip the review sub-step unless:** `--code-review`. Print `code review skipped by default (pass --code-review to run)` and surface `code review: NOT RUN (pass --code-review)` and the unreviewed-changes risk at finalize; the Prevention sub-steps below still run, and you walk the Step 1 blast radius yourself for side effects (callers, public contracts) before reporting.
 
 Use `code-reviewer` subagent for quick review with explicit side-effect sweep.
 
@@ -70,7 +70,7 @@ See HARD-GATE-NO-SIDE-EFFECTS in SKILL.md — on reviewer-flagged regression →
 
 **Review handling:** See `references/review-cycle.md`
 
-**Output:** `✓ Step 4: Review [score]/10 - [prevention measures]`
+**Output:** `✓ Step 4: Review [score]/10 | skipped - [prevention measures]`
 
 ### Step 5: Report
 
@@ -95,7 +95,7 @@ Report summary to user (root cause, files changed, prevention).
 | 1    | `scout` (minimal) or direct file read                                                                                                                                          |
 | 2    | `debug`, `sequential-thinking`                                                                                                                                              |
 | 3    | Parallel `run_shell` for verification                                                                                                                                             |
-| 4    | `code-reviewer` subagent (skipped by `--skip-code-review`)                                                                                                                        |
+| 4    | `code-reviewer` subagent (only with `--code-review`)                                                                                                                            |
 | 5    | Report                                                                                                                                                                            |
 | 6    | `/athena:project-management` (MANDATORY), conditional `docs-manager`, `git-manager`, `/athena:journal` (only when the shared "Journal step — opt-in" applies — see SKILL.md) |
 

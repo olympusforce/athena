@@ -4,7 +4,7 @@
 
 **An agentic coding kit for [Claude Code](https://claude.com/claude-code), packaged as a plugin.**
 
-32 skills · 16 subagents · 8 always-on rules · 6 output styles
+32 skills · 16 subagents · 9 always-on rules · 6 output styles
 
 *Turns an open Claude Code session into a repeatable pipeline:*
 `brainstorm → plan → implement → review → ship`
@@ -33,7 +33,7 @@ Optional, once per repository:
 /athena:setup
 ```
 
-This writes the 8 always-on rules into `.claude/rules/athena-*.md` so they load
+This writes the 9 always-on rules into `.claude/rules/athena-*.md` so they load
 natively and can be committed for teammates. Until you do, the plugin's
 SessionStart hook injects the same rules into every session, so behavior is
 identical either way. The hook detects the materialized files and stops
@@ -127,10 +127,12 @@ green and the project's review gates approve (`/athena:git #159 --watch`).
 | [`/athena:setup`](plugins/athena/skills/setup/SKILL.md) <sup>†</sup> | Write the always-on rules into `.claude/rules/` (plugin-only) |
 
 Flags (`--yagni`, `--advice`, `--journal`, `--test`, `--tasks`,
-`--skip-code-review`, `--tdd`) and per-skill modes are unchanged from the kit;
-each `SKILL.md` frontmatter is the authority. Testing (`--test`) and task
-tracking (`--tasks`) are opt-in; `/athena:ship` still runs tests unless
-`--skip-tests`.
+`--code-review`, `--recommended`, `--tdd`) and per-skill modes come from the
+kit; each `SKILL.md` frontmatter is the authority. Code review
+(`--code-review`, exec/fix), testing (`--test`, exec), and task tracking
+(`--tasks`) are opt-in; `/athena:ship` still reviews and tests unless `--skip-review` /
+`--skip-tests`. `--recommended` takes the model's recommended answer to each
+clarification question and logs it to `decisions.md` in the plan dir.
 
 ## Agents
 

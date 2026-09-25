@@ -13,7 +13,7 @@ argument-hint: '[--check | --remove | --force]'
 
 Arguments: <args>$ARGUMENTS</args>
 
-The athena plugin injects its 8 rules into every session through a SessionStart
+The athena plugin injects its 9 rules into every session through a SessionStart
 hook. This skill writes those same rules into the project instead, as
 `.claude/rules/athena-<name>.md`, so Claude Code loads them natively and the
 hook stops injecting (it checks for `athena-*.md` and exits).

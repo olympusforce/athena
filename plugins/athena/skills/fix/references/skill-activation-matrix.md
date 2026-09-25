@@ -48,7 +48,7 @@ Skip progress orchestration for Quick workflow (< 3 steps).
 | `researcher`          | External docs needed, latest best practices (Deep only)                                                                        |
 | `planner`             | Complex fix needs breakdown, multiple phases (Deep only)                                                                       |
 | `tester`              | After implementation, verify fix works (Step 5)                                                                                |
-| `code-review`      | After fix, verify quality and security (Step 5) (skipped by `--skip-code-review`)                                              |
+| `code-review`      | After fix, verify quality and security (Step 5) (only with `--code-review`)                                                  |
 | `git-manager`         | After approval, commit changes (Step 6)                                                                                        |
 | `docs-manager`        | API/behavior changes need doc updates (Step 6)                                                                                 |
 | `executor` | Parallel independent issues (each gets own agent)                                                                              |

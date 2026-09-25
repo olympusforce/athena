@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke when a completed branch needs PR shipping workflow.'
 category: dev-tools
 keywords: [ship, PR, merge, push, release]
-argument-hint: '[official|beta] [--skip-tests] [--skip-review|--skip-code-review] [--journal] [--skip-docs] [--social] [--yes-post] [--yes-post-private] [--dry-run]'
+argument-hint: '[official|beta] [--skip-tests] [--skip-review|--skip-code-review] [--journal] [--skip-docs] [--social] [--yes-post] [--yes-post-private] [--dry-run] [--recommended]'
 ---
 
 # Ship: Unified Ship Pipeline

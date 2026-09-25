@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke when there is a concrete bug, error, or CI failure.'
 category: utilities
 keywords: [bugfix, error, test-failure, CI, lint]
-argument-hint: '[issue] --auto|--review|--quick|--parallel [--advice] [--journal] [--skip-code-review]'
+argument-hint: '[issue] --auto|--review|--quick|--parallel [--advice] [--journal] [--code-review] [--recommended]'
 ---
 
 # Fixing
@@ -20,7 +20,8 @@ Unified skill for fixing issues of any complexity with intelligent routing.
 - `--parallel` - Activate parallel mode: route to parallel `executor` agents per issue
 - `--advice` - Run under `athena` advisory supervision (see Advisory supervision)
 - `--journal` - Opt into the automatic `/athena:journal` step at finalize (default: skipped)
-- `--skip-code-review` - Skip the code review step (default: it runs)
+- `--recommended` - Auto-take recommended answers and log them (see the always-on `recommended-answers` rule)
+- `--code-review` - Opt into the delegated code review (Step 5 item 4; default: skipped). `--review` only adds human approval gates; it does not imply `--code-review`. Legacy `--skip-code-review` is accepted and ignored
 
 ## Advisory supervision (`--advice`)
 
@@ -176,7 +177,7 @@ acceptance criteria. If the mode is neither explicit nor safely inferable, use
 | ---------------------------- | ------------------------------- | ------------------------------------------ |
 | **Autonomous** (default)     | Simple/moderate issues          | Auto-approve if score >= 9.5 & 0 critical  |
 | **Human-in-the-loop Review** | Critical/production code        | Pause for approval at each step            |
-| **Quick**                    | Type errors, lint, trivial bugs | Fast scout → diagnose → fix → review cycle |
+| **Quick**                    | Type errors, lint, trivial bugs | Fast scout → diagnose → fix → verify cycle |
 
 See `references/mode-selection.md` for ask_user capability format.
 
@@ -257,7 +258,7 @@ Select a solution only from the confirmed diagnosis:
 1. **Verify (iron-law):** Run the EXACT commands from pre-fix state capture. Compare output. NO claims without fresh evidence.
 2. **Regression test:** Add or update test(s) that specifically cover the fixed issue. The test MUST fail without the fix and pass with it.
 3. **Side-effect sweep (NEW):** Run tests across the full **blast radius** identified in Step 2 (not just the modified file). Walk each dependent code path. Confirm public contracts unchanged (signatures, response shapes, DB schemas, env vars).
-4. **Code review (delegate; skipped only by `--skip-code-review`):** Spawn `code-reviewer` subagent with explicit instructions to check: (a) root cause actually addressed (not symptom-patched), (b) no broken business logic in blast radius, (c) no new failure modes, (d) follows existing patterns from scout. Pass scout summary + diagnosis report as context. When `--skip-code-review` is passed, skip this item, print `code review skipped by --skip-code-review`, and surface the unreviewed-changes risk in the Step 6 finalize prompt.
+4. **Code review (delegate; only with `--code-review`):** Spawn `code-reviewer` subagent with explicit instructions to check: (a) root cause actually addressed (not symptom-patched), (b) no broken business logic in blast radius, (c) no new failure modes, (d) follows existing patterns from scout. Pass scout summary + diagnosis report as context. Without `--code-review`, skip this item, print `code review skipped by default (pass --code-review to run)`, and surface `code review: NOT RUN (pass --code-review)` plus the unreviewed-changes risk in the Step 6 finalize prompt. Verification, regression tests, and the side-effect sweep still run.
 5. **Prevention gate:** Apply defense-in-depth validation where applicable.
 6. **Parallel verification:** Launch `run_shell capability` agents for typecheck + lint + build + test.
 
@@ -337,7 +338,7 @@ Load as needed:
 
 - `references/mode-selection.md` - ask_user capability format for mode
 - `references/complexity-assessment.md` - Classification criteria
-- `references/workflow-quick.md` - Quick: scout → diagnose → fix → verify+prevent → review
+- `references/workflow-quick.md` - Quick: scout → diagnose → fix → verify+prevent → review (with `--code-review`)
 - `references/workflow-standard.md` - Standard: full pipeline with Tasks
 - `references/workflow-deep.md` - Deep: research + brainstorm + plan with Tasks
 - `references/review-cycle.md` - Review logic (autonomous vs HITL)

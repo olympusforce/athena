@@ -5,7 +5,7 @@ user-invocable: true
 when_to_use: 'Invoke to implement known scope after requirements are clear.'
 category: utilities
 keywords: [implementation, workflow, feature, pipeline]
-argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto] [--test] [--tasks] [--tdd] [--advice] [--yagni] [--journal] [--skip-code-review]'
+argument-hint: '[task|plan-path] [--interactive|--fast|--parallel|--auto] [--test] [--tasks] [--tdd] [--advice] [--yagni] [--journal] [--code-review] [--recommended]'
 ---
 
 # Execute - Smart Feature Implementation
@@ -27,12 +27,12 @@ End-to-end implementation with automatic workflow detection.
 - `--interactive`: Full workflow with user input (**default**)
 - `--fast`: Skip research, scout→plan→code
 - `--parallel`: Multi-agent execution
-- `--skip-code-review`: Skip the code review step
 - `--auto`: Auto-approve all steps
 
 **Composable flags** (combine with any mode):
 
 - `--test`: Opt into the testing step (Step 4). Default is to skip it
+- `--code-review`: Opt into the code review step (Step 5). Default is to skip it
 - `--tasks`: Opt into mirroring progress to the live task-management surface.
   Default is to track progress in plan files only
 - `--tdd`: Tests-first per phase — write tests for current behavior before
@@ -44,8 +44,11 @@ End-to-end implementation with automatic workflow detection.
   outcome. Default is to implement the full requested scope
 - `--journal`: Opt into the automatic `/athena:journal` step at finalize. Default is to
   skip it
+- `--recommended`: Auto-take the recommended answer to clarification questions,
+  logging each to `{plan-dir}/decisions.md` per the always-on
+  `recommended-answers` rule
 
-Legacy `--no-test` and `--no-tasks` are accepted and ignored (already the default).
+Legacy `--no-test`, `--no-tasks`, and `--skip-code-review` are accepted and ignored (already the default).
 
 **Example:**
 
@@ -133,7 +136,7 @@ Implementation is NOT done until verified to be side-effect-free. Code-review an
 4. No new lint/type/build errors anywhere in the repo.
 5. Public contracts unchanged unless intentional and called out (function signatures, exported types, API responses, DB schemas, env vars, config keys).
 
-Testing is opt-in: unless `--test` (or `--tdd`) ran the testing step, item 2 is a warning, and the finalize report must print `tests: NOT RUN` and surface the unverified-tests risk in the finalize report — in `--auto` too — so the user sees the trade-off rather than having it silently chosen. Items 1, 3, 4, 5 remain enforceable via the `code-reviewer` subagent unless the user invoked `--skip-code-review`, in which case they are unverified — surface that risk in the finalize `ask_user capability` too.
+Testing is opt-in: unless `--test` (or `--tdd`) ran the testing step, item 2 is a warning, and the finalize report must print `tests: NOT RUN` and surface the unverified-tests risk in the finalize report — in `--auto` too — so the user sees the trade-off rather than having it silently chosen. Code review is opt-in too: items 1, 3, 4, 5 are enforced via the `code-reviewer` subagent only with `--code-review`. Without it, the finalize report must print `code review: NOT RUN (pass --code-review)` and surface the unreviewed-changes risk — in `--auto` too.
 
 If review/testing reveals a side effect, regression, or broken workflow, STOP. Use `ask_user capability` to present:
 
@@ -240,13 +243,13 @@ Human review required at these checkpoints (skipped with `--auto`):
 
 - **Post-Research:** Review findings before planning
 - **Post-Plan:** Approve plan before implementation
-- **Post-Implementation:** Approve code before testing (with `--test`) or code review
+- **Post-Implementation:** Approve code before testing (with `--test`), code review (with `--code-review`), or finalize
 - **Post-Testing** (only with `--test`): 100% pass + approve before finalize
 
 **Always enforced (all modes):**
 
 - **Testing (only with `--test` or `--tdd`):** 100% pass required. Otherwise print `tests skipped by default (pass --test to run)`
-- **Code Review (default; skipped only by `--skip-code-review`):** Spawn `code-reviewer` subagent with explicit checks:
+- **Code Review (only with `--code-review`):** Otherwise print `code review skipped by default (pass --code-review to run)`. With the flag, spawn `code-reviewer` subagent with explicit checks:
   (a) every acceptance criterion met,
   (b) no regression to business logic in touchpoints/blast-radius,
   (c) no breaking changes to public contracts (signatures, schemas, APIs, env vars) unless called out,
@@ -283,12 +286,12 @@ Explicit `/athena:journal` is unaffected. The rest of the Finalize block above s
 | Scout    | `scout`                                                                                   | Optional in code                                    |
 | Plan     | `planner`                                                                                    | Optional in code                                    |
 | Testing  | `tester`, `debugger`                                                                         | **MUST** spawn with `--test`/`--tdd`                |
-| Review   | `code-reviewer`                                                                              | **MUST** spawn unless `--skip-code-review`          |
+| Review   | `code-reviewer`                                                                              | **MUST** spawn with `--code-review`                 |
 | Finalize | `/athena:project-management`; conditional `docs-manager`; configured git workflow | Project sync and docs-impact decision are mandatory |
 
 **CRITICAL ENFORCEMENT:**
 
-- Steps 4, 5, 6 **MUST** use the live delegation capability to spawn subagents (Step 4 only with `--test`/`--tdd`; Step 5 only when `--skip-code-review` was not passed)
+- Steps 4, 5, 6 **MUST** use the live delegation capability to spawn subagents (Step 4 only with `--test`/`--tdd`; Step 5 only with `--code-review`)
 - DO NOT implement testing, review, or finalization yourself - DELEGATE
 - If workflow ends without the required delegations, it is INCOMPLETE
 - Pattern: `delegate_agent capability(subagent_type="[type]", prompt="[task]", description="[brief]")`

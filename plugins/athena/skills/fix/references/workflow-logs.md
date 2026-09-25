@@ -50,7 +50,7 @@ re-diagnose before changing more code.
 
 ### Step 6: Review
 
-**Skip if:** `--skip-code-review`. Print `code review skipped by --skip-code-review` and surface the unreviewed-changes risk at finalize.
+**Skip unless:** `--code-review`. Print `code review skipped by default (pass --code-review to run)` and surface `code review: NOT RUN (pass --code-review)` and the unreviewed-changes risk at finalize.
 
 Use the code-reviewer agent and retain fresh verification evidence.
 
